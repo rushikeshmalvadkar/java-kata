@@ -67,8 +67,10 @@ public class RepositoryStore {
 
     public static void deleteRepo(String repoName, String userName) {
         List<Repo> userRepositories = findAll(userName);
-        Repo repo = userRepositories.stream().filter(re -> re.getName().equals(repoName)).findFirst().orElseThrow(() -> new RepoNotFoundException("repo not found"));
-        userRepositories.remove(repo);
+        boolean removeRepo = userRepositories.removeIf(repo -> repo.getName().equals(repoName));
+        if(!removeRepo){
+            throw new RepoNotFoundException("repo not found");
+        }
         USER_NAME_TO_REPOS_MAP.put(userName,userRepositories);
     }
 }
