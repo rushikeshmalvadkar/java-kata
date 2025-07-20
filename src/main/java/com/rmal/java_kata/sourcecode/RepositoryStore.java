@@ -43,13 +43,14 @@ public class RepositoryStore {
     }
 
     public static void renameRepo(String oldReoName, String newRepoName, String userName) {
-        List<Repo> userRepo = findAll(userName);
-        userRepo.forEach( repo ->
-        {
-            if(repo.getName().equals(oldReoName)){
-                repo.setName(newRepoName);USER_NAME_TO_REPOS_MAP
-                .put(userName, userRepo);
-            }
+        USER_NAME_TO_REPOS_MAP.computeIfPresent(userName, (user, repos) -> {
+            Repo repoToRename = repos.stream()
+                    .filter(repo -> repo.getName().equals(oldReoName))
+                    .findFirst()
+                    .orElseThrow(() -> new RepoNotFoundException("Repository not found: " + oldReoName));
+
+            repoToRename.setName(newRepoName);
+            return repos;
         });
 
     }
@@ -63,4 +64,5 @@ public class RepositoryStore {
                 .findFirst().orElseThrow(() -> new RepoNotFoundException("repoNotFound"));
 
     }
+
 }

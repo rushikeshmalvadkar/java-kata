@@ -64,6 +64,13 @@ public class RepositoryStoreTest {
                 .isInstanceOf(RepoNotFoundException.class).hasMessage("repoNotFound");
     }
 
+    @Test
+    void should_try_to_rename_not_exist_repository_of_user(){
+        Repo repo1 = Repo.of("java");
+        String  repoName = RepositoryStore.add("rushikesh", repo1);
+        assertThatThrownBy(()-> RepositoryStore.renameRepo("ja", "java-kata","rushikesh"))
+                .isInstanceOf(RepoNotFoundException.class).hasMessage("Repository not found: ja");
+    }
 
 
 }
