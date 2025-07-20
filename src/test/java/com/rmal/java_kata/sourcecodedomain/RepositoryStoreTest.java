@@ -94,8 +94,24 @@ public class RepositoryStoreTest {
          RepositoryStore.add("rushikesh", repo1);
          RepositoryStore.add("rushikesh", repo2);
          RepositoryStore.add("rushikesh", repo3);
-        List<Repo> searchResult = RepositoryStore.searchRepo("ja", "rushikesh");
+        List<Repo> searchResult = RepositoryStore.search("ja", "rushikesh");
        assertThat(searchResult).hasSize(2);
+        assertThat(searchResult).extracting("name").containsExactlyInAnyOrder("java","java-kata");
+
+    }
+
+    @Test
+    void should_search_repo_with_uppercase(){
+        Repo repo1 = Repo.of("java");
+        Repo repo2 = Repo.of("java-kata");
+        Repo repo3 = Repo.of("spring-kata");
+
+
+        RepositoryStore.add("rushikesh", repo1);
+        RepositoryStore.add("rushikesh", repo2);
+        RepositoryStore.add("rushikesh", repo3);
+        List<Repo> searchResult = RepositoryStore.search("JavA", "rushikesh");
+        assertThat(searchResult).hasSize(2);
         assertThat(searchResult).extracting("name").containsExactlyInAnyOrder("java","java-kata");
 
     }

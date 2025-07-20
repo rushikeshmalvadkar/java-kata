@@ -5,6 +5,8 @@ import com.rmal.java_kata.sourcecode.exceptions.RepoNotFoundException;
 import java.util.*;
 import java.util.function.Predicate;
 
+import static com.rmal.java_kata.util.StringUtils.containsIgnoreCase;
+
 
 public class RepositoryStore {
 
@@ -18,11 +20,15 @@ public class RepositoryStore {
         return repo.name();
     }
 
-    public static List<Repo> searchRepo(String searchText, String userName) {
-        List<Repo> userRepositories = findReposOf(userName);
-        return userRepositories.stream()
-                .filter(repo -> repo.name().contains(searchText))
+    public static List<Repo> search(String searchText, String userName) {
+        List<Repo> userRepos = findReposOf(userName);
+        return userRepos.stream()
+                .filter(byRepoName(searchText))
                 .toList();
+    }
+
+    private static Predicate<Repo> byRepoName(String searchText) {
+        return repo -> containsIgnoreCase(repo.name(), searchText);
     }
 
     public static void deleteRepo(String repoName, String userName) {
