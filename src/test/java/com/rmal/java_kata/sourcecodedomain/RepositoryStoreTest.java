@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -24,7 +23,7 @@ public class RepositoryStoreTest {
     void should_create_one_repo() {
         Repo repo1 = Repo.of("java");
         String  repoName = RepositoryStore.add("rushikesh", repo1);
-        List<Repo> repoList = RepositoryStore.findAll("rushikesh");
+        List<Repo> repoList = RepositoryStore.findReposOf("rushikesh");
         assertThat(repoName).isEqualTo("java");
         assertThat(repoList).hasSize(1);
     }
@@ -37,7 +36,7 @@ public class RepositoryStoreTest {
         Repo repo2 = Repo.of("spring-kata");
         String  repoName2 = RepositoryStore.add("rushikesh", repo2);
 
-        List<Repo> repoList = RepositoryStore.findAll("rushikesh");
+        List<Repo> repoList = RepositoryStore.findReposOf("rushikesh");
         assertThat(repoList).hasSize(2);
     }
 
@@ -57,11 +56,13 @@ public class RepositoryStoreTest {
     void should_rename_existing_repository_of_user(){
         Repo repo1 = Repo.of("java");
         String  repoName = RepositoryStore.add("rushikesh", repo1);
+
        RepositoryStore.renameRepo("java", "java-kata","rushikesh");
+
         Repo renameRepo = RepositoryStore.findRepoBy("java-kata", "rushikesh");
-        assertThat(renameRepo.getName()).isEqualTo("java-kata");
+        assertThat(renameRepo.name()).isEqualTo("java-kata");
         assertThatThrownBy(()-> RepositoryStore.findRepoBy("java", "rushikesh"))
-                .isInstanceOf(RepoNotFoundException.class).hasMessage("repoNotFound");
+                .isInstanceOf(RepoNotFoundException.class).hasMessage("Repository not found");
     }
 
     @Test
@@ -69,17 +70,36 @@ public class RepositoryStoreTest {
         Repo repo1 = Repo.of("java");
         String  repoName = RepositoryStore.add("rushikesh", repo1);
         assertThatThrownBy(()-> RepositoryStore.renameRepo("ja", "java-kata","rushikesh"))
-                .isInstanceOf(RepoNotFoundException.class).hasMessage("Repository not found: ja");
+                .isInstanceOf(RepoNotFoundException.class).hasMessage("Repository not found");
     }
 
     @Test
     void should_delete_delete_repo(){
         Repo repo1 = Repo.of("java");
         String  repoName = RepositoryStore.add("rushikesh", repo1);
+
         RepositoryStore.deleteRepo("java","rushikesh");
+
         assertThatThrownBy(()-> RepositoryStore.findRepoBy("java", "rushikesh"))
-                .isInstanceOf(RepoNotFoundException.class).hasMessage("repoNotFound");
+                .isInstanceOf(RepoNotFoundException.class).hasMessage("Repository not found");
     }
+
+    @Test
+    void should_search_repo(){
+        Repo repo1 = Repo.of("java");
+        Repo repo2 = Repo.of("java-kata");
+        Repo repo3 = Repo.of("spring-kata");
+
+
+         RepositoryStore.add("rushikesh", repo1);
+         RepositoryStore.add("rushikesh", repo2);
+         RepositoryStore.add("rushikesh", repo3);
+        List<Repo> searchResult = RepositoryStore.searchRepo("ja", "rushikesh");
+       assertThat(searchResult).hasSize(2);
+        assertThat(searchResult).extracting("name").containsExactlyInAnyOrder("java","java-kata");
+
+    }
+
 
 
 }
