@@ -2,12 +2,14 @@ package com.rmal.java_kata.sourcecodedomain;
 
 import com.rmal.java_kata.sourcecode.Repo;
 import com.rmal.java_kata.sourcecode.RepositoryStore;
+import com.rmal.java_kata.sourcecode.exceptions.RepoNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -49,6 +51,17 @@ public class RepositoryStoreTest {
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("repository already exist");
 
+    }
+
+    @Test
+    void should_rename_existing_repository_of_user(){
+        Repo repo1 = Repo.of("java");
+        String  repoName = RepositoryStore.add("rushikesh", repo1);
+       RepositoryStore.renameRepo("java", "java-kata","rushikesh");
+        Repo renameRepo = RepositoryStore.findRepoBy("java-kata", "rushikesh");
+        assertThat(renameRepo.getName()).isEqualTo("java-kata");
+        assertThatThrownBy(()-> RepositoryStore.findRepoBy("java", "rushikesh"))
+                .isInstanceOf(RepoNotFoundException.class).hasMessage("repoNotFound");
     }
 
 

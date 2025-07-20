@@ -1,9 +1,8 @@
 package com.rmal.java_kata.sourcecode;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.rmal.java_kata.sourcecode.exceptions.RepoNotFoundException;
+
+import java.util.*;
 import java.util.function.Predicate;
 
 
@@ -17,10 +16,10 @@ public class RepositoryStore {
         checkForRepoNameExists(repo, userRepos);
         userRepos.add(repo);
         USER_NAME_TO_REPOS_MAP.put(userName, userRepos);
-        return repo.name();
+        return repo.getName();
     }
 
-    private static void checkForRepoNameExists(Repo repo, List<Repo> userRepos) {
+    public static void checkForRepoNameExists(Repo repo, List<Repo> userRepos) {
         if (repoNameAlreadyExists(repo, userRepos)) {
             throw new IllegalArgumentException("repository already exist");
         }
@@ -32,7 +31,7 @@ public class RepositoryStore {
     }
 
     private static Predicate<Repo> withNameOf(Repo newRepo) {
-        return repo -> repo.name().equals(newRepo.name());
+        return repo -> repo.getName().equals(newRepo.getName());
     }
 
     public static List<Repo> findAll(String username) {
@@ -43,4 +42,25 @@ public class RepositoryStore {
         USER_NAME_TO_REPOS_MAP.clear();
     }
 
+    public static void renameRepo(String oldReoName, String newRepoName, String userName) {
+        List<Repo> userRepo = findAll(userName);
+        userRepo.forEach( repo ->
+        {
+            if(repo.getName().equals(oldReoName)){
+                repo.setName(newRepoName);USER_NAME_TO_REPOS_MAP
+                .put(userName, userRepo);
+            }
+        });
+
+    }
+
+
+    public static Repo findRepoBy(String repoName, String userName) {
+        List<Repo> userRepositories = findAll(userName);
+        return userRepositories
+                .stream()
+                .filter(repository -> repository.getName().equals(repoName))
+                .findFirst().orElseThrow(() -> new RepoNotFoundException("repoNotFound"));
+
+    }
 }

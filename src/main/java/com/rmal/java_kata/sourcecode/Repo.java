@@ -1,12 +1,20 @@
 package com.rmal.java_kata.sourcecode;
 
-public record Repo( String name  ) {
+import lombok.Getter;
+import lombok.Setter;
 
-    public Repo(String name ){
-        this .name= name;
+@Getter
+@Setter
+public  class Repo {
+    private  String name;
+
+
+    public Repo(String name) {
+        this.name = name;
     }
 
-    public static Repo of(String name){
+    public static Repo of(String name) {
         return new Repo(name);
     }
+
 }
