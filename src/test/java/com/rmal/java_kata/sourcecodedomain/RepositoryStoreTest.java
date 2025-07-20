@@ -72,5 +72,14 @@ public class RepositoryStoreTest {
                 .isInstanceOf(RepoNotFoundException.class).hasMessage("Repository not found: ja");
     }
 
+    @Test
+    void should_delete_delete_repo(){
+        Repo repo1 = Repo.of("java");
+        String  repoName = RepositoryStore.add("rushikesh", repo1);
+        RepositoryStore.deleteRepo("java","rushikesh");
+        assertThatThrownBy(()-> RepositoryStore.findRepoBy("java", "rushikesh"))
+                .isInstanceOf(RepoNotFoundException.class).hasMessage("repoNotFound");
+    }
+
 
 }
