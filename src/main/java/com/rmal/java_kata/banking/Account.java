@@ -3,10 +3,10 @@ package com.rmal.java_kata.banking;
 import lombok.Getter;
 
 import java.math.BigDecimal;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.*;
 
 import static java.math.BigDecimal.ZERO;
+import static java.util.stream.Collectors.groupingBy;
 
 @Getter
 public class Account {
@@ -28,20 +28,39 @@ public class Account {
 
     private BigDecimal totalWithDraw() {
         return transactions.stream()
-                .filter(Transaction::isWithdraw)
+                .filter(Transaction::isSpend)
                 .map(Transaction::getAmount)
                 .reduce(ZERO, BigDecimal::add);
     }
 
     private BigDecimal totalDeposit() {
         return transactions.stream()
-                .filter(Transaction::isDeposit)
+                .filter(Transaction::isCredit)
                 .map(Transaction::getAmount)
                 .reduce(ZERO, BigDecimal::add);
     }
 
     public void addTransaction(Transaction transaction) {
         this.transactions.add(transaction);
+    }
+
+    public List<Transaction> highestTransaction(){
+        Map<BigDecimal, List<Transaction>> amountToTransactionsMap = transactions.stream()
+                .filter(Transaction::isSpend)
+                .collect(groupingBy(Transaction::getAmount));
+        // Entry -> key , value -> spend amount , list of transaction
+        Comparator<Map.Entry<BigDecimal, List<Transaction>>> AMOUNT_NATURAL_ORDER_COMPARATOR =
+                Map.Entry.comparingByKey();
+        Map.Entry<BigDecimal, List<Transaction>> mostSpendTransactionMap = amountToTransactionsMap
+                .entrySet()
+                .stream()
+                .max(AMOUNT_NATURAL_ORDER_COMPARATOR)
+                .orElse(null);
+
+        if (Objects.nonNull(mostSpendTransactionMap)) {
+            return mostSpendTransactionMap.getValue();
+        }
+        return List.of();
     }
 
 }

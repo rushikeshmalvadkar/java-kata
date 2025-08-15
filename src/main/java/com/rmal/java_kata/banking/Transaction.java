@@ -38,11 +38,11 @@ public class Transaction {
     }
 
 
-    public boolean isWithdraw() {
+    public boolean isSpend() {
         return transcationType == SPEND;
     }
 
-    public boolean isDeposit() {
+    public boolean isCredit() {
         return transcationType == CREDIT;
     }
 }

@@ -4,8 +4,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Set;
 
+import static com.rmal.java_kata.banking.AccountStore.findHighestTransaction;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -63,5 +65,16 @@ class AccountStoreTest {
                 .hasMessage("No sufficient balance for spend");
     }
 
+    @Test
+    void should_check_highest_transaction() {
+        AccountStore.credit("rushikesh", new BigDecimal("200"), "Some description");
+        AccountStore.credit("rushikesh", new BigDecimal("200"), "Some description");
+        AccountStore.spend("rushikesh",new BigDecimal("100"),"For shopping");
+        AccountStore.spend("rushikesh",new BigDecimal("100"),"For Toy");
+        AccountStore.spend("rushikesh",new BigDecimal("50"),"For Pen");
+        List<Transaction> higestTransaction = findHighestTransaction("rushikesh");
+        assertThat(higestTransaction).hasSize(2);
+
+    }
 
 }

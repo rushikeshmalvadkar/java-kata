@@ -1,6 +1,7 @@
 package com.rmal.java_kata.banking;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -56,4 +57,8 @@ public class AccountStore {
         return totalBalance(userName).compareTo(amount) < 0;
     }
 
+    public static List<Transaction> findHighestTransaction(String userName) {
+        Account account = AccountStore.accountOf(userName);
+        return account.highestTransaction();
+    }
 }
