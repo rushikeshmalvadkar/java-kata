@@ -63,4 +63,10 @@ public class Account {
         return List.of();
     }
 
+    public void addTranscationInBatch(List<ImportTranscationTemp> importTranscationTempList) {
+        for (ImportTranscationTemp importTranscationTemp : importTranscationTempList) {
+           Transaction transaction = Transaction.from(importTranscationTemp);
+           addTransaction(transaction);
+        }
+    }
 }

@@ -1,10 +1,17 @@
 package com.rmal.java_kata.banking;
 
+import org.springframework.core.io.Resource;
+
+import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Stream;
+
+import static org.springframework.util.CollectionUtils.isEmpty;
 
 
 public class AccountStore {
@@ -60,5 +67,63 @@ public class AccountStore {
     public static List<Transaction> findHighestTransaction(String userName) {
         Account account = AccountStore.accountOf(userName);
         return account.highestTransaction();
+    }
+
+
+    public static ImportTransactionsResult importTransactions(String username, Resource csvResource) {
+        List<ImportTranscationTemp> importTranscationTempList = prepareImportTransactionTemps(csvResource);
+        List<String> errors = TransactionValidator.validate(importTranscationTempList);
+        if (hasValidationVoiltaion(errors)) {
+            return ImportTransactionsResult.failed(errors);
+        }
+        Account account = accountOf(username);
+        account.addTranscationInBatch(importTranscationTempList);
+        updatedStore(username, account);
+        return completedResponse(importTranscationTempList);
+    }
+
+    private static boolean hasValidationVoiltaion(List<String> errors) {
+        return !isEmpty(errors);
+    }
+
+    private static void updatedStore(String username, Account account) {
+        USERNAME_TO_ACCOCUN_MAP.putIfAbsent(username, account);
+    }
+
+    private static ImportTransactionsResult completedResponse(List<ImportTranscationTemp> importTranscationTempList) {
+        return ImportTransactionsResult.completed("%s transactions imported successfully".formatted(importTranscationTempList.size()));
+    }
+
+    private static List<ImportTranscationTemp> prepareImportTransactionTemps(Resource csvResource) {
+        try {
+            return transcationTemps(csvResource);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
+    private static List<ImportTranscationTemp> transcationTemps(Resource csvResource) throws IOException {
+        InputStream inputStream = csvResource.getInputStream();
+        byte[] csvBytes = inputStream.readAllBytes();
+        String csvLinesAsString = new String(csvBytes);
+        String[] csvLinesAsArray = csvLinesAsString.split("\n");
+        List<String> csvLines = Stream.of(csvLinesAsArray)
+                .toList();
+        return csvLines.stream()
+                .skip(1)
+                .map(AccountStore::parse)
+                .toList();
+    }
+
+    private static ImportTranscationTemp parse(String csvLine) {
+        String[] csvLineAsArray = csvLine.split(",");
+        return new ImportTranscationTemp(
+                csvLineAsArray[0],
+                csvLineAsArray[1],
+                csvLineAsArray[2],
+                csvLineAsArray[3]
+        );
+
     }
 }
