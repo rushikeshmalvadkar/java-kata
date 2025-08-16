@@ -119,10 +119,10 @@ public class AccountStore {
     private static ImportTranscationTemp parse(String csvLine) {
         String[] csvLineAsArray = csvLine.split(",");
         return new ImportTranscationTemp(
-                csvLineAsArray[0],
-                csvLineAsArray[1],
-                csvLineAsArray[2],
-                csvLineAsArray[3]
+                csvLineAsArray.length > 0 ? csvLineAsArray[0] : "",
+                csvLineAsArray.length > 1 ? csvLineAsArray[1] : "",
+                csvLineAsArray.length > 2 ? csvLineAsArray[2] : "",
+                csvLineAsArray.length > 3 ? csvLineAsArray[3] : ""
         );
 
     }
